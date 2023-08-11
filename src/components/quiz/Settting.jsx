@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import CategoryService from "../../services/categoryService";
 import { difficulties } from "../../services/common";
+import { SettingContext } from "../../Context/SettingProvider";
+import { useNavigate } from "react-router-dom";
 
 function Setting() {
     const [categoryList, setCategoryList] = useState([])
     const [difficultyList, setDifficultyList] = useState([])
-    const [setting, setSeting] = useState({
-        amount: 0,
-        difficulty: '',
-        category: ''
-    })
+    const [selectLevel, setSelectLevel] = useState('Easy')
+    const { setting, setSetting } = useContext(SettingContext)
+    const navigate = useNavigate();
 
     useEffect(() => {
         async function feetchData() {
@@ -20,6 +20,26 @@ function Setting() {
         feetchData()
     }, [])
 
+    const handleInputValue = (e) => {
+        setSetting({
+            ...setting,
+            [e.target.name]: e.target.value
+        })
+    }
+
+    const handleStartQuiz = (e) => {
+        e.preventDefault();
+        navigate('/quiz')
+    }
+
+    const handleSelecDifficulty = (levelName) => {
+        setSelectLevel(levelName)
+        setSetting({
+            ...setting,
+            difficulty: levelName.toLowerCase()
+        })
+    }
+
     return (
         <div className="container d-flex justify-content-center align-items-center flex-column">
             <div className="bg-warning row col-sm-6 mt-2 rounded-top py-2">
@@ -29,13 +49,16 @@ function Setting() {
                 <div className="row mb-3">
                     <label className="col-sm-5 col-form-label">Number of Question</label>
                     <div className="col-sm-7">
-                        <input type="number" className="form-control" />
+                        <input type="number"
+                            className="form-control"
+                            value={setting.amount}
+                            name="amount" onInput={handleInputValue} />
                     </div>
                 </div>
                 <div className="row mb-3">
                     <label className="col-sm-5 col-form-label">Category</label>
                     <div className="col-sm-7">
-                        <select className="form-control">
+                        <select className="form-control" name="category" onChange={handleInputValue}>
                             {
                                 categoryList.map((cat) => (
                                     <option key={cat.id} value={cat.name} >{cat.name}</option>
@@ -50,7 +73,10 @@ function Setting() {
                         {
                             difficultyList.map((level) => (
                                 <div key={level.id} className="form-check">
-                                    <input className="form-check-input" type="radio" name="difficulty" />
+                                    <input className="form-check-input" type="radio"
+                                        name="difficulty"
+                                        checked={level.name === selectLevel}
+                                        onChange={() => handleSelecDifficulty(level.name)} />
                                     <label className="form-check-label">{level.name}</label>
                                 </div>
                             ))
@@ -58,7 +84,7 @@ function Setting() {
                     </div>
                 </fieldset>
                 <div className="mb-3 d-flex">
-                    <button type="submit" className="btn btn-primary me-2">Start Quiz</button>
+                    <button type="submit" className="btn btn-primary me-2" onClick={handleStartQuiz}>Start Quiz</button>
                     <button type="button" className="btn btn-dark">Reset</button>
                 </div>
 
