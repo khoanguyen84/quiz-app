@@ -55,7 +55,7 @@ function Setting() {
                             name="amount" onInput={handleInputValue} />
                     </div>
                 </div>
-                <div className="row mb-3">
+                {/* <div className="row mb-3">
                     <label className="col-sm-5 col-form-label">Category</label>
                     <div className="col-sm-7">
                         <select className="form-control" name="category" onChange={handleInputValue}>
@@ -66,7 +66,7 @@ function Setting() {
                             }
                         </select>
                     </div>
-                </div>
+                </div> */}
                 <fieldset className="row mb-3">
                     <legend className="col-form-label col-sm-5 pt-0">Difficulty</legend>
                     <div className="col-sm-7">
