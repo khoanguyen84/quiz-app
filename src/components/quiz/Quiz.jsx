@@ -2,10 +2,11 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import QuizService from "../../services/quizService";
 import { SettingContext } from "../../Context/SettingProvider";
 import DOMPurify from "dompurify";
+import { Link } from "react-router-dom";
 
 function Quiz() {
     const [quizList, setQuizList] = useState([])
-    const [numberOfQuiz, setNumberOfQuiz] = useState(1)
+    const [currentQuiz, setCurrentQuiz] = useState(0)
     const [quiz, setQuiz] = useState({})
     const { setting } = useContext(SettingContext)
     useEffect(() => {
@@ -15,7 +16,11 @@ function Quiz() {
                 return {
                     ...item,
                     id: index + 1,
-                    user_answers: []
+                    answerList: Array.isArray(item.correct_answer) ?
+                        [...item.incorrect_answers, ...item.correct_answer] :
+                        [...item.incorrect_answers, item.correct_answer],
+                    user_answers: [],
+                    is_correct: false
                 }
             })
             setQuizList(data);
@@ -23,61 +28,93 @@ function Quiz() {
         getQuizList()
     }, [])
 
+
     useEffect(() => {
-        if (quizList && quizList.length) {
-            let currentQuiz = quizList[numberOfQuiz - 1];
-            const answerList = Array.isArray(currentQuiz.correct_answer) ?
-                [...currentQuiz.incorrect_answers, ...currentQuiz.correct_answer] :
-                [...currentQuiz.incorrect_answers, currentQuiz.correct_answer]
-            setQuiz({ ...currentQuiz, answerList })
+        if (currentQuiz < quizList.length) {
+            console.log(quizList[currentQuiz]);
+            setQuiz(quizList[currentQuiz])
         }
-    }, [numberOfQuiz, quizList])
+    }, [currentQuiz, quizList])
 
     const handleNextQuiz = () => {
-        if (numberOfQuiz < quizList.length) {
-            setNumberOfQuiz(numberOfQuiz + 1);
+        if (currentQuiz < quizList.length) {
+            setCurrentQuiz(currentQuiz + 1);
         }
     }
 
     const handlePreviousQuiz = () => {
-        if (numberOfQuiz > 1) {
-            setNumberOfQuiz(numberOfQuiz - 1);
+        if (currentQuiz > 0) {
+            setCurrentQuiz(currentQuiz - 1);
         }
     }
 
     const handleAnswerQuiz = (quizId, answer) => {
-        let newQuiz = {
-            ...quiz,
-            user_answers: [answer]
-        }
-        setQuiz(newQuiz)
+        setQuizList(prev => {
+            let newQuizList = prev.map((quiz) => {
+                if (quiz.id === quizId) {
+                    if (Array.isArray(quiz.correct_answer)) {
+                        quiz.user_answers = [...quiz.user_answers, answer]
+                    }
+                    else {
+                        quiz.user_answers = [answer]
+                    }
+                    quiz.is_correct = quiz.correct_answer.includes(quiz.user_answers)
+                }
+                return quiz;
+            })
+
+            return newQuizList;
+        })
     }
     return (
         <div className="container">
             <div className="row mt-2 d-flex align-items-center justify-content-center">
                 {
-                    Object.keys(quiz).length ? (
-                        <div className="card bg-success col-sm-6 text-white p-2">
-                            <div className="card-header">
-                                {DOMPurify.sanitize(quiz.question)}
+                    currentQuiz >= quizList.length ?
+                        (
+                            <div className="card bg-warning col-sm-6 text-white p-2">
+                                <div className="card-header">Result</div>
+                                <div className="card-body">
+                                    <p>You answered correct {(quizList.filter((item) => item.is_correct)).length}/{quizList.length}</p>
+                                </div>
+                                <div className="card-footer">
+                                    <Link to={"/"} className="btn btn-primary me-2">Quiz Again</Link>
+                                    <button type="button" className="btn btn-secondary text-white" onClick={handlePreviousQuiz}>Back To Quiz</button>
+                                </div>
                             </div>
-                            <ul className="list-group list-group-flush rounded">
-                                {
-                                    quiz.answerList.map((answer) => (
-                                        <li role="button" key={answer} className={quiz.user_answers.includes(answer) ? 'list-group-item active' : "list-group-item"}
-                                            onClick={() => handleAnswerQuiz(quiz.id, answer)}
-                                        >{answer}</li>
-                                    ))
-                                }
-                            </ul>
-                            <div className="card-footer d-flex justify-content-between">
-                                <button type="button" className="btn btn-link text-white" onClick={handlePreviousQuiz}>Previous Quiz</button>
-                                <button type="button" className="btn btn-link text-white" onClick={handleNextQuiz}>Next Quiz</button>
+                        ) :
+                        quiz && Object.keys(quiz).length && (
+                            <div className="card bg-success col-sm-6 text-white p-2">
+                                <div className="card-header">
+                                    <p><span className="fw-bolder">Category</span>: {DOMPurify.sanitize(quiz.category)}</p>
+                                    <p><span className="fw-bolder">Type</span>: {Array.isArray(quiz.correct_answer) ? 'Multiple' : 'Single'}</p>
+                                    <p><span className="fw-bolder">Question</span>: {DOMPurify.sanitize(quiz.question)}</p>
+                                </div>
+                                <ul className="list-group list-group-flush rounded">
+                                    {
+                                        quiz.answerList.map((answer) => (
+                                            <li role="button" key={answer} className={quiz.user_answers.includes(answer) ? 'list-group-item active' : "list-group-item"}
+                                                onClick={() => handleAnswerQuiz(quiz.id, answer)}
+                                            >{DOMPurify.sanitize(answer)}</li>
+                                        ))
+                                    }
+                                </ul>
+                                <div className="card-footer d-flex justify-content-between">
+                                    <button type="button" className="btn btn-link text-white" disabled={currentQuiz <= 0} onClick={handlePreviousQuiz}>Previous Quiz</button>
+                                    {
+                                        (currentQuiz == quizList.length - 1) ? (
+                                            <button type="button" className="btn btn-danger text-white" onClick={handleNextQuiz}>Submission</button>
+                                        ) : (
+                                            <button type="button" className="btn btn-link text-white" disabled={currentQuiz >= quizList.length} onClick={handleNextQuiz}>Next Quiz</button>
+                                        )
+                                    }
+
+                                </div>
                             </div>
-                        </div>
-                    ) : null
+                        )
                 }
             </div>
+
         </div>
     )
 }
