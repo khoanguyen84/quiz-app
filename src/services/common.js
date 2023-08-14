@@ -12,6 +12,10 @@ const difficulties = [
     {
         id: 3,
         name: "Hard"
+    },
+    {
+        id: 4,
+        name: "Mix Difficulties"
     }
 ]
 

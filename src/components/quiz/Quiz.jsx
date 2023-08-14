@@ -3,13 +3,17 @@ import QuizService from "../../services/quizService";
 import { SettingContext } from "../../Context/SettingProvider";
 import DOMPurify from "dompurify";
 import { Link } from "react-router-dom";
+import Spinner from "../layout/Spinner";
+import MainLayout from "../layout/MainLayout";
 
 function Quiz() {
     const [quizList, setQuizList] = useState([])
     const [currentQuiz, setCurrentQuiz] = useState(0)
     const [quiz, setQuiz] = useState({})
+    const [loading, setLoading] = useState(false);
     const { setting } = useContext(SettingContext)
     useEffect(() => {
+        setLoading(true)
         async function getQuizList() {
             let quizListRes = await QuizService.getQuizList(setting);
             let data = quizListRes?.data?.results.map((item, index) => {
@@ -24,6 +28,7 @@ function Quiz() {
                 }
             })
             setQuizList(data);
+            setLoading(false)
         }
         getQuizList()
     }, [])
@@ -67,55 +72,78 @@ function Quiz() {
         })
     }
     return (
-        <div className="container">
-            <div className="row mt-2 d-flex align-items-center justify-content-center">
+        <MainLayout>
+            <div className="container">
                 {
-                    currentQuiz >= quizList.length ?
-                        (
-                            <div className="card bg-warning col-sm-6 text-white p-2">
-                                <div className="card-header">Result</div>
-                                <div className="card-body">
-                                    <p>You answered correct {(quizList.filter((item) => item.is_correct)).length}/{quizList.length}</p>
-                                </div>
-                                <div className="card-footer">
-                                    <Link to={"/"} className="btn btn-primary me-2">Quiz Again</Link>
-                                    <button type="button" className="btn btn-secondary text-white" onClick={handlePreviousQuiz}>Back To Quiz</button>
-                                </div>
+                    loading ? <Spinner /> : (
+                        <>
+                            <div className="row mt-2 d-flex align-items-center justify-content-center">
+                                {
+                                    currentQuiz >= quizList.length ?
+                                        (
+                                            <div className="card bg-warning col-sm-6 text-white p-2">
+                                                <div className="card-header">Result</div>
+                                                <div className="card-body">
+                                                    <p>You answered correct {(quizList.filter((item) => item.is_correct)).length}/{quizList.length}</p>
+                                                </div>
+                                                <div className="card-footer">
+                                                    <Link to={"/"} className="btn btn-primary me-2">Quiz Again</Link>
+                                                    <button type="button" className="btn btn-secondary text-white" onClick={handlePreviousQuiz}>Back To Quiz</button>
+                                                </div>
+                                            </div>
+                                        ) :
+                                        quiz && Object.keys(quiz).length && (
+                                            <div className="card bg-success col-sm-6 text-white p-2">
+                                                <div className="card-header">
+                                                    <p><span className="fw-bolder">Category</span>: {DOMPurify.sanitize(quiz.category)}</p>
+                                                    <p><span className="fw-bolder">Difficulty</span>: {DOMPurify.sanitize(quiz.difficulty)}</p>
+                                                    <p><span className="fw-bolder">Type</span>: {Array.isArray(quiz.correct_answer) ? 'Multiple' : 'Single'}</p>
+                                                    <p><span className="fw-bolder">Question</span>: {DOMPurify.sanitize(quiz.question)}</p>
+                                                </div>
+                                                <ul className="list-group list-group-flush rounded">
+                                                    {
+                                                        quiz.answerList.map((answer) => (
+                                                            <li role="button" key={answer} className={quiz.user_answers.includes(answer) ? 'list-group-item active' : "list-group-item"}
+                                                                onClick={() => handleAnswerQuiz(quiz.id, answer)}
+                                                            >{DOMPurify.sanitize(answer)}</li>
+                                                        ))
+                                                    }
+                                                </ul>
+                                                <div className="card-footer d-flex justify-content-between">
+                                                    <button type="button" className="btn btn-link text-white" disabled={currentQuiz <= 0} onClick={handlePreviousQuiz}>Previous Quiz</button>
+                                                    {
+                                                        (currentQuiz == quizList.length - 1) ? (
+                                                            <button type="button" className="btn btn-danger text-white" onClick={handleNextQuiz}>Submission</button>
+                                                        ) : (
+                                                            <button type="button" className="btn btn-link text-white" disabled={currentQuiz >= quizList.length} onClick={handleNextQuiz}>Next Quiz</button>
+                                                        )
+                                                    }
+
+                                                </div>
+                                            </div>
+                                        )
+                                }
                             </div>
-                        ) :
-                        quiz && Object.keys(quiz).length && (
-                            <div className="card bg-success col-sm-6 text-white p-2">
-                                <div className="card-header">
-                                    <p><span className="fw-bolder">Category</span>: {DOMPurify.sanitize(quiz.category)}</p>
-                                    <p><span className="fw-bolder">Type</span>: {Array.isArray(quiz.correct_answer) ? 'Multiple' : 'Single'}</p>
-                                    <p><span className="fw-bolder">Question</span>: {DOMPurify.sanitize(quiz.question)}</p>
-                                </div>
-                                <ul className="list-group list-group-flush rounded">
+                            <div className="row mt-2 d-flex align-items-center justify-content-center">
+                                <div className="col-sm-6">
                                     {
-                                        quiz.answerList.map((answer) => (
-                                            <li role="button" key={answer} className={quiz.user_answers.includes(answer) ? 'list-group-item active' : "list-group-item"}
-                                                onClick={() => handleAnswerQuiz(quiz.id, answer)}
-                                            >{DOMPurify.sanitize(answer)}</li>
+                                        quizList && quizList.map((quiz, index) => (
+                                            <span role="button" className={
+                                                `${index == currentQuiz ? 'border border-danger border-2' : ''} 
+                                btn btn-sm btn-w30 me-1 mb-1 
+                                ${quiz.user_answers.length ? 'btn-success' : 'btn-warning'}`
+                                            }
+                                                onClick={() => setCurrentQuiz(index)}
+                                            >{quiz.id}</span>
                                         ))
                                     }
-                                </ul>
-                                <div className="card-footer d-flex justify-content-between">
-                                    <button type="button" className="btn btn-link text-white" disabled={currentQuiz <= 0} onClick={handlePreviousQuiz}>Previous Quiz</button>
-                                    {
-                                        (currentQuiz == quizList.length - 1) ? (
-                                            <button type="button" className="btn btn-danger text-white" onClick={handleNextQuiz}>Submission</button>
-                                        ) : (
-                                            <button type="button" className="btn btn-link text-white" disabled={currentQuiz >= quizList.length} onClick={handleNextQuiz}>Next Quiz</button>
-                                        )
-                                    }
-
                                 </div>
                             </div>
-                        )
+                        </>
+                    )
                 }
             </div>
-
-        </div>
+        </MainLayout>
     )
 }
 

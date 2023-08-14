@@ -1,9 +1,22 @@
-.logo-sm{
+.logo-sm {
   width: 40px;
   height: 40px;
 }
 
-.list-group-item:hover{
+.list-group-item:hover {
   background-color: gray;
   color: white;
+  }
+
+.btn-w30 {
+  width: 30px;
+}
+
+
+.dropdown:hover>.dropdown-menu {
+  display: block;
+}
+
+.dropdown>.dropdown-toggle:active {
+    pointer-events: none;
 }

@@ -3,6 +3,14 @@ import { QUIZ_API_URL } from "./common";
 
 class QuizService {
     static getQuizList(params) {
+        if(params.difficulty === 'mix difficulties'){
+            return axios.get(QUIZ_API_URL, {
+                params: {
+                    amount: params.amount
+                    // category: params.category
+                }
+            });
+        }
         return axios.get(QUIZ_API_URL, {
             params: {
                 amount: params.amount,
