@@ -5,6 +5,13 @@ import { SettingContext } from "../../Context/SettingProvider";
 import { Link, useNavigate } from "react-router-dom";
 import Spinner from './../layout/Spinner';
 import MainLayout from "../layout/MainLayout";
+import * as yup from 'yup'
+import { useForm } from "react-hook-form";
+import { yupResolver } from '@hookform/resolvers/yup'
+
+const schema = yup.object({
+    amount: yup.number().positive().integer().min(5).required().typeError("Invalid question number!")
+})
 
 function Setting() {
     const [categoryList, setCategoryList] = useState([])
@@ -13,6 +20,9 @@ function Setting() {
     const [loading, setLoading] = useState(false);
     const { setting, setSetting } = useContext(SettingContext)
     const navigate = useNavigate();
+    const { register, handleSubmit, formState: { errors } } = useForm({
+        resolver: yupResolver(schema)
+    })
 
     useEffect(() => {
         setLoading(true)
@@ -32,8 +42,7 @@ function Setting() {
         })
     }
 
-    const handleStartQuiz = (e) => {
-        e.preventDefault();
+    const handleStartQuiz = (data) => {
         navigate('/quiz')
     }
 
@@ -59,14 +68,15 @@ function Setting() {
                         <div className="bg-warning row col-sm-6 mt-2 rounded-top py-2">
                             <h5 className="text-center text-white">Quiz Setting</h5>
                         </div>
-                        <form className="row col-sm-6 border border-warning p-3">
+                        <form onSubmit={handleSubmit(handleStartQuiz)} className="row col-sm-6 border border-warning p-3">
                             <div className="row mb-3">
                                 <label className="col-sm-5 col-form-label">Number of Question</label>
                                 <div className="col-sm-7">
                                     <input type="number"
                                         className="form-control"
                                         value={setting.amount}
-                                        name="amount" onInput={handleInputValue} />
+                                        {...register("amount")} onInput={handleInputValue} />
+                                    <span className="text-danger">{errors.amount?.message}</span>
                                 </div>
                             </div>
                             {/* <div className="row mb-3">
@@ -98,7 +108,7 @@ function Setting() {
                                 </div>
                             </fieldset>
                             <div className="mb-3 d-flex">
-                                <button type="submit" className="btn btn-primary me-2" onClick={handleStartQuiz}>Start Quiz</button>
+                                <button type="submit" className="btn btn-primary me-2">Start Quiz</button>
                                 {/* <Link to={'/quiz'} className="btn btn-primary me-2">Start Quiz</Link> */}
                                 <button type="button" className="btn btn-dark" onClick={handleResetSetting}>Reset</button>
                             </div>

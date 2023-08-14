@@ -5,6 +5,9 @@ import DOMPurify from "dompurify";
 import { Link } from "react-router-dom";
 import Spinner from "../layout/Spinner";
 import MainLayout from "../layout/MainLayout";
+import QuizDetail from "./QuizDetail";
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 function Quiz() {
     const [quizList, setQuizList] = useState([])
@@ -71,6 +74,22 @@ function Quiz() {
             return newQuizList;
         })
     }
+
+    const handleSubmission = () => {
+        confirmAlert({
+            // title: 'Confirm to submit',
+            message: 'Are you sure to submission?',
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: () => handleNextQuiz()
+                },
+                {
+                    label: 'No'
+                }
+            ]
+        });
+    }
     return (
         <MainLayout>
             <div className="container">
@@ -81,16 +100,7 @@ function Quiz() {
                                 {
                                     currentQuiz >= quizList.length ?
                                         (
-                                            <div className="card bg-warning col-sm-6 text-white p-2">
-                                                <div className="card-header">Result</div>
-                                                <div className="card-body">
-                                                    <p>You answered correct {(quizList.filter((item) => item.is_correct)).length}/{quizList.length}</p>
-                                                </div>
-                                                <div className="card-footer">
-                                                    <Link to={"/setting"} className="btn btn-primary me-2">Quiz Again</Link>
-                                                    <button type="button" className="btn btn-secondary text-white" onClick={handlePreviousQuiz}>Back To Quiz</button>
-                                                </div>
-                                            </div>
+                                            <QuizDetail quizList={quizList} />
                                         ) :
                                         quiz && Object.keys(quiz).length && (
                                             <div className="card bg-success col-sm-6 text-white p-2">
@@ -113,7 +123,7 @@ function Quiz() {
                                                     <button type="button" className="btn btn-link text-white" disabled={currentQuiz <= 0} onClick={handlePreviousQuiz}>Previous Quiz</button>
                                                     {
                                                         (currentQuiz == quizList.length - 1) ? (
-                                                            <button type="button" className="btn btn-danger text-white" onClick={handleNextQuiz}>Submission</button>
+                                                            <button type="button" className="btn btn-danger text-white" onClick={handleSubmission}>Submission</button>
                                                         ) : (
                                                             <button type="button" className="btn btn-link text-white" disabled={currentQuiz >= quizList.length} onClick={handleNextQuiz}>Next Quiz</button>
                                                         )
@@ -124,21 +134,26 @@ function Quiz() {
                                         )
                                 }
                             </div>
-                            <div className="row mt-2 d-flex align-items-center justify-content-center">
-                                <div className="col-sm-6">
-                                    {
-                                        quizList && quizList.map((quiz, index) => (
-                                            <span role="button" className={
-                                                `${index == currentQuiz ? 'border border-danger border-2' : ''} 
+                            {
+                                currentQuiz < quizList.length && (
+                                    <div className="row mt-2 d-flex align-items-center justify-content-center">
+                                        <div className="col-sm-6">
+                                            {
+                                                quizList && quizList.map((quiz, index) => (
+                                                    <span role="button" className={
+                                                        `${index == currentQuiz ? 'border border-danger border-2' : ''} 
                                                     btn btn-sm btn-w30 me-1 mb-1 
                                                     ${quiz.user_answers.length ? 'btn-success' : 'btn-warning'}`
+                                                    }
+                                                        onClick={() => setCurrentQuiz(index)}
+                                                    >{quiz.id}</span>
+                                                ))
                                             }
-                                                onClick={() => setCurrentQuiz(index)}
-                                            >{quiz.id}</span>
-                                        ))
-                                    }
-                                </div>
-                            </div>
+                                        </div>
+                                    </div>
+                                )
+                            }
+
                         </>
                     )
                 }
