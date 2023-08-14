@@ -1,12 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import logo from '../../assets/logo.jpg';
 import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../Context/AuthProvider";
+import { auth } from "../../firebase/config";
 
 function Navbar() {
-    const navigate = useNavigate();
-    const handleLogout = () => {
-        navigate("/")
-    }
+    const user = useContext(AuthContext)
     return (
         <nav className="navbar navbar-dark bg-success py-0">
             <div className="container">
@@ -16,13 +15,16 @@ function Navbar() {
                 </Link>
                 
                 <div className="dropdown">
-                    <button className="btn btn-link text-white" > Khoa Nguyễn</button>
+                    <div>
+                        {user.photoURL && <img className="avatar-sm rounded-circle" src={user.photoURL} alt="" />}
+                        <button className="btn btn-link text-white" >{user.displayName || user.email}</button>
+                    </div>
                     <ul className="dropdown-menu">
                         <li>
                             <a className="dropdown-item" href="#">History</a>
                         </li>
                         <li>
-                            <button className="dropdown-item" onClick={handleLogout}>Logout</button>
+                            <button className="dropdown-item" onClick={async () => await auth.signOut()}>Logout</button>
                         </li>
                     </ul>
                 </div>

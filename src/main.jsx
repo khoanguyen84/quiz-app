@@ -7,13 +7,16 @@ import './index.css'
 
 import { BrowserRouter } from 'react-router-dom';
 import SettingProvider from './Context/SettingProvider';
+import AuthProvider from './Context/AuthProvider';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
-      <SettingProvider>
-        <App />
-      </SettingProvider>
+      <AuthProvider>
+        <SettingProvider>
+          <App />
+        </SettingProvider>
+      </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>,
 )
