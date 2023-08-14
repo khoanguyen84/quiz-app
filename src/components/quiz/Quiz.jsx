@@ -87,7 +87,7 @@ function Quiz() {
                                                     <p>You answered correct {(quizList.filter((item) => item.is_correct)).length}/{quizList.length}</p>
                                                 </div>
                                                 <div className="card-footer">
-                                                    <Link to={"/"} className="btn btn-primary me-2">Quiz Again</Link>
+                                                    <Link to={"/setting"} className="btn btn-primary me-2">Quiz Again</Link>
                                                     <button type="button" className="btn btn-secondary text-white" onClick={handlePreviousQuiz}>Back To Quiz</button>
                                                 </div>
                                             </div>
@@ -130,8 +130,8 @@ function Quiz() {
                                         quizList && quizList.map((quiz, index) => (
                                             <span role="button" className={
                                                 `${index == currentQuiz ? 'border border-danger border-2' : ''} 
-                                btn btn-sm btn-w30 me-1 mb-1 
-                                ${quiz.user_answers.length ? 'btn-success' : 'btn-warning'}`
+                                                    btn btn-sm btn-w30 me-1 mb-1 
+                                                    ${quiz.user_answers.length ? 'btn-success' : 'btn-warning'}`
                                             }
                                                 onClick={() => setCurrentQuiz(index)}
                                             >{quiz.id}</span>

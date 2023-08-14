@@ -44,7 +44,13 @@ function Setting() {
             difficulty: levelName.toLowerCase()
         })
     }
-
+    const handleResetSetting = () => {
+        setSelectLevel('Easy')
+        setSetting({
+            ...setting,
+            amount: 5
+        })
+    }
     return (
         <MainLayout>
             {
@@ -93,7 +99,7 @@ function Setting() {
                             </fieldset>
                             <div className="mb-3 d-flex">
                                 <button type="submit" className="btn btn-primary me-2" onClick={handleStartQuiz}>Start Quiz</button>
-                                <button type="button" className="btn btn-dark">Reset</button>
+                                <button type="button" className="btn btn-dark" onClick={handleResetSetting}>Reset</button>
                             </div>
 
                         </form>

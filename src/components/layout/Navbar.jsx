@@ -1,12 +1,16 @@
 import React from "react";
 import logo from '../../assets/logo.jpg';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Navbar() {
+    const navigate = useNavigate();
+    const handleLogout = () => {
+        navigate("/")
+    }
     return (
         <nav className="navbar navbar-dark bg-success py-0">
             <div className="container">
-                <Link className="navbar-brand" to={"/"}>
+                <Link className="navbar-brand" to={"/setting"}>
                     <img src={logo} alt="" className="rounded-circle logo-sm me-2" />
                     QUIZ APP
                 </Link>
@@ -18,7 +22,7 @@ function Navbar() {
                             <a className="dropdown-item" href="#">History</a>
                         </li>
                         <li>
-                            <a className="dropdown-item" href="#">Logout</a>
+                            <button className="dropdown-item" onClick={handleLogout}>Logout</button>
                         </li>
                     </ul>
                 </div>
