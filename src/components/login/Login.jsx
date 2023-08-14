@@ -1,10 +1,12 @@
 import React from "react";
 import firebase, { auth, db } from "../../firebase/config";
 import { addDoc, collection } from 'firebase/firestore';
+import { useNavigate } from "react-router-dom";
 
 const googleProvider = new firebase.auth.GoogleAuthProvider();
 
 function Login() {
+    const navigate = useNavigate();
     const handleGoogleLogin = async () => {
         const { additionalUserInfo, user } = await auth.signInWithPopup(googleProvider);
         if(additionalUserInfo?.isNewUser){
@@ -16,6 +18,7 @@ function Login() {
                 providerId: additionalUserInfo?.providerId
             })
         }
+        navigate('/setting')
     }
     return (
         <div className="container d-flex justify-content-center align-items-center flex-column">

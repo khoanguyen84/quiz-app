@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import CategoryService from "../../services/categoryService";
 import { difficulties } from "../../services/common";
 import { SettingContext } from "../../Context/SettingProvider";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Spinner from './../layout/Spinner';
 import MainLayout from "../layout/MainLayout";
 
@@ -99,6 +99,7 @@ function Setting() {
                             </fieldset>
                             <div className="mb-3 d-flex">
                                 <button type="submit" className="btn btn-primary me-2" onClick={handleStartQuiz}>Start Quiz</button>
+                                {/* <Link to={'/quiz'} className="btn btn-primary me-2">Start Quiz</Link> */}
                                 <button type="button" className="btn btn-dark" onClick={handleResetSetting}>Reset</button>
                             </div>
 

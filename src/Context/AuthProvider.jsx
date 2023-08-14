@@ -14,12 +14,11 @@ function AuthProvider({ children }) {
             if (user) {
                 const { uid, displayName, email, photoURL } = user?.multiFactor?.user;
                 setUser({ uid, displayName, email, photoURL })
-                navigate("/setting", { replace: true });
                 setLoading(false)
                 return;
             }
             setLoading(false);
-            navigate("/", { replace: true })
+            navigate("/")
         })
 
         return () => unsubscibed();
