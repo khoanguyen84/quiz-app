@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import logo from '../../assets/logo.jpg';
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AuthContext } from "../../Context/AuthProvider";
 import { auth } from "../../firebase/config";
 
@@ -21,7 +21,7 @@ function Navbar() {
                     </div>
                     <ul className="dropdown-menu">
                         <li>
-                            <a className="dropdown-item" href="#">History</a>
+                            <Link className="dropdown-item" to={'/quiz/history'}>History</Link>
                         </li>
                         <li>
                             <button className="dropdown-item" onClick={async () => await auth.signOut()}>Logout</button>

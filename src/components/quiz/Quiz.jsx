@@ -6,15 +6,23 @@ import { Link } from "react-router-dom";
 import Spinner from "../layout/Spinner";
 import MainLayout from "../layout/MainLayout";
 import QuizDetail from "./QuizDetail";
-import { confirmAlert } from 'react-confirm-alert'; // Import
-import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import { db } from "../../firebase/config";
+import { AuthContext } from "../../Context/AuthProvider";
 
 function Quiz() {
     const [quizList, setQuizList] = useState([])
     const [currentQuiz, setCurrentQuiz] = useState(0)
     const [quiz, setQuiz] = useState({})
     const [loading, setLoading] = useState(false);
+
+    const [duration, setDuration] = useState({
+        quiz_date: null,
+        start_time: null,
+    })
     const { setting } = useContext(SettingContext)
+    const user = useContext(AuthContext);
     useEffect(() => {
         setLoading(true)
         async function getQuizList() {
@@ -31,6 +39,11 @@ function Quiz() {
                 }
             })
             setQuizList(data);
+            setDuration({
+                ...duration,
+                quiz_date: new Date().valueOf(),
+                start_time: new Date().valueOf(),
+            })
             setLoading(false)
         }
         getQuizList()
@@ -82,7 +95,18 @@ function Quiz() {
             buttons: [
                 {
                     label: 'Yes',
-                    onClick: () => handleNextQuiz()
+                    onClick: async () => {
+                        await db.collection("histories").add({
+                            uid: user.uid,
+                            quiz_date: duration.quiz_date,
+                            start_time: duration.start_time,
+                            end_time: new Date().valueOf(),
+                            no_of_questions: quizList.length,
+                            no_of_correct_answers: (quizList.filter((item) => item.is_correct)).length,
+                            quiz_list: quizList
+                        })
+                        handleNextQuiz();
+                    }
                 },
                 {
                     label: 'No'
