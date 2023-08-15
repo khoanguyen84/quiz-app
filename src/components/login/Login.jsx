@@ -9,7 +9,6 @@ function Login() {
     const navigate = useNavigate();
     const handleGoogleLogin = async () => {
         const { additionalUserInfo, user } = await auth.signInWithPopup(googleProvider);
-        console.log(user);
         if(additionalUserInfo?.isNewUser){
             await addDoc(collection(db, 'users'), {
                 displayName: user.displayName,
