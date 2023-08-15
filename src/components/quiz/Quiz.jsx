@@ -1,8 +1,7 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import QuizService from "../../services/quizService";
 import { SettingContext } from "../../Context/SettingProvider";
 import DOMPurify from "dompurify";
-import { Link } from "react-router-dom";
 import Spinner from "../layout/Spinner";
 import MainLayout from "../layout/MainLayout";
 import QuizDetail from "./QuizDetail";
@@ -52,7 +51,6 @@ function Quiz() {
 
     useEffect(() => {
         if (currentQuiz < quizList.length) {
-            console.log(quizList[currentQuiz]);
             setQuiz(quizList[currentQuiz])
         }
     }, [currentQuiz, quizList])
@@ -177,7 +175,6 @@ function Quiz() {
                                     </div>
                                 )
                             }
-
                         </>
                     )
                 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import CategoryService from "../../services/categoryService";
 import { difficulties } from "../../services/common";
 import { SettingContext } from "../../Context/SettingProvider";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Spinner from './../layout/Spinner';
 import MainLayout from "../layout/MainLayout";
 import * as yup from 'yup'
