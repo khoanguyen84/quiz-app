@@ -41,7 +41,12 @@ function History() {
                     </thead>
                     <tbody>
                         {
-                            historyList.map((history) => (
+                            !historyList.length ? (
+                                <tr>
+                                    <td className="text-center" colSpan={8}>Empty Data</td>
+                                </tr>
+                            ) :
+                            historyList?.map((history) => (
                                 <tr key={history.id}>
                                     <td className="text-wrap">{moment(history.quiz_date).format('DD/MM/yyyy')}</td>
                                     <td>{moment(history.start_time).format('HH:mm:ss')}</td>
@@ -74,25 +79,23 @@ function History() {
                                     </div>
                                     <div className="modal-body py-0">
                                         {
-                                            historyDetail && (
-                                                historyDetail.quiz_list?.map((quiz) => (
-                                                    <div key={quiz.id} className={`${quiz.is_correct ? "bg-secondary" : "bg-danger"} card row ctext-white p-2 my-1`}>
-                                                        <div className="card-header">
-                                                            <p><span className="fw-bolder">Question</span>: {DOMPurify.sanitize(quiz.question)}</p>
-                                                        </div>
-                                                        <ul className="list-group list-group-flush rounded">
-                                                            {
-                                                                quiz.answerList.map((answer) => (
-                                                                    <li key={answer} className={quiz.user_answers.includes(answer) ? 'list-group-item active' : "list-group-item"}>{DOMPurify.sanitize(answer)}</li>
-                                                                ))
-                                                            }
-                                                        </ul>
-                                                        <div className="card-footer">
-                                                            <p><span className="fw-bolder">Correct answer</span>: {DOMPurify.sanitize(quiz.correct_answer)}</p>
-                                                        </div>
+                                            historyDetail.quiz_list?.map((quiz) => (
+                                                <div key={quiz.id} className={`${quiz.is_correct ? "bg-secondary" : "bg-danger"} card row ctext-white p-2 my-1`}>
+                                                    <div className="card-header">
+                                                        <p><span className="fw-bolder">Question</span>: {DOMPurify.sanitize(quiz.question)}</p>
                                                     </div>
-                                                ))
-                                            )
+                                                    <ul className="list-group list-group-flush rounded">
+                                                        {
+                                                            quiz.answerList.map((answer) => (
+                                                                <li key={answer} className={quiz.user_answers.includes(answer) ? 'list-group-item active' : "list-group-item"}>{DOMPurify.sanitize(answer)}</li>
+                                                            ))
+                                                        }
+                                                    </ul>
+                                                    <div className="card-footer">
+                                                        <p><span className="fw-bolder">Correct answer</span>: {DOMPurify.sanitize(quiz.correct_answer)}</p>
+                                                    </div>
+                                                </div>
+                                            ))
                                         }
                                     </div>
                                     <div className="modal-footer py-0">
